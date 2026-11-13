@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ประเมินงบต่อเติมบ้านเบื้องต้น by เติมเต็มบ้าน</title>
+<meta name="description" content="เครื่องมือประเมินงบประมาณต่อเติมบ้านเบื้องต้น โรงจอดรถ ห้องครัว ห้องข้างบ้าน พร้อมคำนวณค่าออกแบบและถอด BOQ โดย เติมเต็มบ้าน">
+<meta name="theme-color" content="#1f4e8c">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="ประเมินงบต่อเติมบ้านเบื้องต้น by เติมเต็มบ้าน">
+<meta property="og:description" content="เลือกประเภทงาน วัสดุ และพื้นที่ เพื่อดูช่วงงบประมาณเบื้องต้นก่อนคุยกับช่าง พร้อมข้อแนะนำและส่วนลดค่าออกแบบ">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef1f3;--surface:#fff;--ink:#14283a;--muted:#566676;--line:#c9d3db;
+  --accent:#1f4e8c;--accent-ink:#fff;--soft:#dfe8f2;--warn:#8a5a00;--warnbg:#fff4d6;--good:#1d6b3a;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0f1a24;--surface:#172633;--ink:#e8eef4;--muted:#9db0c0;--line:#2b3e4f;--accent:#7fb1ea;--accent-ink:#0f1a24;--soft:#1d3347;--warn:#f0c76a;--warnbg:#3a2f12;--good:#7fd09a;color-scheme:dark}
+}
+:root[data-theme="dark"]{--bg:#0f1a24;--surface:#172633;--ink:#e8eef4;--muted:#9db0c0;--line:#2b3e4f;--accent:#7fb1ea;--accent-ink:#0f1a24;--soft:#1d3347;--warn:#f0c76a;--warnbg:#3a2f12;--good:#7fd09a;color-scheme:dark}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Thai","Noto Sans Thai",Tahoma,sans-serif;line-height:1.6;font-size:16px}
+main{max-width:560px;margin:0 auto;padding:24px 16px 110px}
+h1{font-size:26px;line-height:1.3;margin:0 0 6px;font-weight:700}
+.sub{color:var(--muted);margin:0 0 18px}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;margin:0 0 14px}
+.step h2{font-size:17px;margin:0 0 12px;display:flex;gap:10px;align-items:center;font-weight:600}
+.step h2 i{flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-style:normal;font-size:14px;display:grid;place-items:center}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chips.c3{grid-template-columns:repeat(3,1fr)}
+.chips.c1{grid-template-columns:1fr}
+.chips label{display:block;position:relative}
+.chips input{position:absolute;opacity:0;pointer-events:none;inset:0}
+.chips span{display:block;height:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;cursor:pointer;font-size:15px;line-height:1.35;transition:border-color .15s, background .15s;-webkit-tap-highlight-color:transparent}
+.chips b{display:block;font-weight:600}
+.chips em{display:block;font-style:normal;color:var(--accent);font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
+.chips small{display:block;color:var(--muted);font-size:13px;line-height:1.35;margin-top:2px}
+.chips input:checked+span{border-color:var(--accent);background:var(--soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.chips input:focus-visible+span{outline:3px solid var(--accent);outline-offset:2px}
+.chips input:checked+span svg{transform:scale(1.06)}
+.c3 span{text-align:center;padding:12px 6px;font-size:14px}
+.c3 svg{width:46px;height:46px;display:block;margin:0 auto 8px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s ease}
+.vnote{background:var(--warnbg);color:var(--warn);padding:9px 12px;border-radius:8px;font-size:14px;margin:10px 0 0}
+
+/* Mobile Stepper & Area Input */
+.row{display:flex;gap:10px;align-items:center}
+input[type=range]{flex:1;accent-color:var(--accent);height:32px;min-width:0;touch-action:manipulation}
+.stepper{display:inline-flex;align-items:center;background:var(--surface);border:1.5px solid var(--line);border-radius:8px;overflow:hidden;flex-shrink:0}
+.stepper .num{border:0;border-radius:0;width:52px;text-align:center;padding:8px 0;background:transparent;color:var(--ink);font:inherit;font-size:18px;font-weight:700}
+.step-btn{width:38px;height:42px;background:var(--soft);color:var(--ink);border:0;font-size:20px;font-weight:700;display:grid;place-items:center;cursor:pointer;padding:0;user-select:none;-webkit-tap-highlight-color:transparent;transition:background .1s}
+.step-btn:active{background:var(--line);transform:scale(0.95)}
+.num:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.unit{color:var(--muted);font-weight:500}
+
+/* Presets with Thumb Friendly targets */
+.presets{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.presets button{width:auto;min-height:38px;padding:8px 14px;background:var(--soft);color:var(--ink);font-weight:600;font-size:14px;border:1.5px solid var(--line);border-radius:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .1s, background .1s}
+.presets button:active{background:var(--line);transform:scale(0.96)}
+
+/* Touch Friendly Option Cards in Step 4 */
+.opts-grid{display:flex;flex-direction:column;gap:8px}
+.opt-card{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);cursor:pointer;transition:border-color .15s, background .15s, transform .1s;-webkit-tap-highlight-color:transparent}
+.opt-card:active{transform:scale(0.99)}
+.opt-card.checked{border-color:var(--accent);background:var(--soft)}
+.opt-card.off{opacity:.6;cursor:default;background:var(--bg)}
+.opt-card input{margin-top:3px;accent-color:var(--accent);width:20px;height:20px;flex:none}
+.opt-card b{display:block;font-size:15px;font-weight:600}
+.opt-card small{display:block;color:var(--muted);font-size:13px;line-height:1.35;margin-top:2px}
+
+.dtot{font-weight:700;font-size:17px;margin-top:10px}
+.bnote{background:var(--soft);border-radius:8px;padding:10px 12px;font-size:14px;margin:10px 0 0}
+.disc{display:flex;gap:10px;align-items:flex-start;margin-top:10px;font-size:15px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.disc input{margin-top:4px;width:20px;height:20px;accent-color:var(--accent);flex:none}
+
+.result{background:var(--surface);border:2px solid var(--ink);border-radius:10px;padding:20px 16px 18px;margin:18px 0 14px}
+.result h2{font-size:15px;font-weight:600;margin:0 0 4px;color:var(--muted)}
+.big{font-size:30px;font-weight:700;line-height:1.25;font-variant-numeric:tabular-nums}
+.avg{color:var(--muted);font-size:14px;margin-top:2px}
+.dim{position:relative;height:44px;margin:16px 6px 6px}
+.dim .ln{position:absolute;left:0;right:0;top:20px;height:2px;background:var(--accent)}
+.dim .tk{position:absolute;top:10px;width:2px;height:22px;background:var(--accent)}
+.dim .tk.l{left:0}.dim .tk.r{right:0}.dim .tk.m{left:50%}
+.dim .ar{position:absolute;top:15px;width:10px;height:12px;background:var(--accent)}
+.dim .ar.l{left:2px;clip-path:polygon(100% 0,0 50%,100% 100%)}
+.dim .ar.r{right:2px;clip-path:polygon(0 0,100% 50%,0 100%)}
+.dimlab{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;margin-top:14px;font-size:15px}
+td{padding:7px 0;border-top:1px solid var(--line);vertical-align:top}
+td:last-child{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;padding-left:10px}
+tr.neg td:last-child{color:var(--good)}
+tr.tot td{font-weight:700;border-top:2px solid var(--ink)}
+.note{background:var(--warnbg);color:var(--warn);padding:10px 12px;border-radius:8px;font-size:14px;margin:0 0 14px}
+.tips{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.tips h3{margin:0 0 6px;font-size:16px}
+.tips ul{margin:0;padding-left:20px}.tips li{margin:4px 0}
+
+/* Buttons & Touch Feel */
+button{font:inherit;font-weight:600;padding:12px 16px;border:0;border-radius:8px;background:var(--accent);color:var(--accent-ink);width:100%;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .1s, background .15s}
+button:active{transform:scale(0.98)}
+button:disabled{opacity:.5;cursor:default}
+.btn-sec{background:var(--soft);color:var(--ink);border:1.5px solid var(--line)}
+.btn-outline{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.actions-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:14px}
+@media(min-width:480px){.actions-grid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}}
+
+/* Compact Screenshot Box for Mobile */
+.snap-box{background:var(--surface);border:2px dashed var(--accent);border-radius:10px;padding:14px;margin-bottom:14px;text-align:left;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.snap-head{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;color:var(--accent);margin-bottom:10px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.snap-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:8px;margin-bottom:10px;font-size:14px}
+.snap-grid small{display:block;color:var(--muted);font-size:12px}
+.snap-grid b{display:block;font-size:15px;color:var(--ink)}
+.snap-total{background:var(--soft);border-radius:8px;padding:10px;text-align:center;margin-bottom:0}
+.snap-total small{display:block;color:var(--muted);font-size:12px;line-height:1}
+.snap-total .val{font-size:22px;font-weight:700;color:var(--accent);margin-top:4px;font-variant-numeric:tabular-nums}
+
+a.chat{display:inline-block;padding:12px 16px;border-radius:8px;background:var(--accent);color:var(--accent-ink);font-weight:600;text-decoration:none;white-space:nowrap;text-align:center;-webkit-tap-highlight-color:transparent;transition:transform .1s}
+a.chat:active{transform:scale(0.98)}
+.cta{background:var(--soft);border-radius:10px;padding:16px 14px;margin-bottom:14px;text-align:center}
+.cta p{margin:0 0 14px;font-size:15px;line-height:1.6}
+.cta p strong{display:inline-block;margin-bottom:3px;font-size:16px}
+.cta a.chat{display:block;font-size:16px;padding:14px 16px}
+.foot{text-align:center;color:var(--muted);font-size:14px;margin-top:20px}
+.foot a{color:var(--accent);font-weight:600}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:2px solid var(--ink);transform:translateY(115%);transition:transform .2s}
+.bar.on{transform:none}
+.bar small{display:block;color:var(--muted);font-size:13px;line-height:1.2}
+.bar b{font-size:18px;font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){.bar{transition:none}}
+
+/* สำหรับการสั่งพิมพ์ หรือบันทึกเป็น PDF */
+@media print{
+  body{background:#fff!important;color:#000!important;font-size:14px}
+  main{max-width:100%!important;padding:0!important}
+  .bar,.presets,input[type=range],.stepper button,.actions-grid,.cta,.vnote,.bnote,.note{display:none!important}
+  .step,.result,.tips,.snap-box{border:1px solid #aaa!important;background:#fff!important;page-break-inside:avoid}
+  .chips input:checked+span,.opt-card.checked{background:#f4f4f4!important;border-color:#000!important;color:#000!important}
+  .foot{margin-top:16px;font-size:12px}
+  .foot a{color:#000!important;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<main>
+  <h1>ประเมินงบต่อเติมบ้านเบื้องต้น by เติมเต็มบ้าน</h1>
+  <p class="sub">เลือกประเภทงาน วัสดุ และพื้นที่ แล้วดูช่วงงบก่อนไปขอใบเสนอราคาจากช่าง</p>
+
+  <section class="step"><h2><i>1</i>ต่อเติมอะไร</h2><div class="chips c3" id="types"></div></section>
+
+  <section class="step"><h2><i>2</i><span id="vtitle">เลือกวัสดุ</span></h2>
+    <div class="chips" id="vars"></div><p class="vnote" id="vnote" hidden></p></section>
+
+  <section class="step"><h2><i>3</i>พื้นที่ที่จะต่อเติม</h2>
+    <div class="row">
+      <input type="range" id="rng" min="1" max="80" value="12" aria-label="พื้นที่ตารางเมตร">
+      <div class="stepper">
+        <button type="button" class="step-btn" id="sub_area" aria-label="ลดพื้นที่">−</button>
+        <input class="num" id="area" type="number" min="1" max="500" value="12" inputmode="decimal" aria-label="พื้นที่ ตารางเมตร">
+        <button type="button" class="step-btn" id="add_area" aria-label="เพิ่มพื้นที่">+</button>
+      </div>
+      <span class="unit">ตร.ม.</span>
+    </div>
+    <div class="presets" id="presets"></div>
+  </section>
+
+  <section class="step opts"><h2><i>4</i>งานที่อาจต้องเพิ่ม</h2><div id="adds"></div></section>
+
+  <section class="step"><h2><i>5</i>ค่าออกแบบโดยเติมเต็มบ้าน</h2>
+    <div class="chips" id="design"></div>
+    <p class="vnote" id="dnote" style="background:none;color:var(--muted);padding:0"></p>
+    <div class="dtot" id="dtot"></div>
+    <label class="disc" id="discw" hidden><input type="checkbox" id="disc"><span>แคปหน้าจอนี้แล้วทักแชท รับส่วนลด 10% ค่าออกแบบและถอด BOQ</span></label>
+    <p class="bnote">BOQ คือใบแสดงรายการวัสดุและค่าใช้จ่ายในงานก่อสร้าง นำไปให้ผู้รับเหมา 2-3 เจ้าเสนอราคาเทียบกันได้โดยไม่ตกหล่น และทุกเจ้าสร้างตามแบบมาตรฐานเดียวกัน</p>
+  </section>
+
+  <section class="result" id="res" aria-live="polite">
+    <h2>งบโดยประมาณ</h2>
+    <div class="big" id="range">-</div>
+    <div class="avg" id="avg"></div>
+    <div class="dim" aria-hidden="true"><div class="ln"></div><div class="tk l"></div><div class="tk m"></div><div class="tk r"></div><div class="ar l"></div><div class="ar r"></div></div>
+    <div class="dimlab"><span id="lo">-</span><span id="mid">-</span><span id="hi">-</span></div>
+    <table id="bd"></table>
+  </section>
+
+  <!-- กล่องใบสรุปย่อสำหรับแคปหน้าจอรูปเดียวจบ (Mobile Screenshot Box) -->
+  <div class="snap-box" id="snap_box">
+    <div class="snap-head">
+      <span>📋 ใบสรุปประเมินงบ (สำหรับแคปหน้าจอ)</span>
+      <strong>เติมเต็มบ้าน</strong>
+    </div>
+    <div class="snap-grid">
+      <div><small>งานต่อเติม</small><b id="s_job">-</b></div>
+      <div><small>พื้นที่</small><b id="s_area">-</b></div>
+    </div>
+    <div class="snap-total">
+      <small>งบประมาณประเมินเบื้องต้น</small>
+      <div class="val" id="s_val">-</div>
+    </div>
+  </div>
+
+  <div class="cta">
+    <p><strong>แคปหน้าจอใบประเมินด้านบนนี้</strong><br>แล้วทักแชทเพื่อรับส่วนลด 10% ค่าออกแบบและถอด BOQ</p>
+    <a class="chat" href="https://m.me/termtembaan.design" target="_blank" rel="noopener">ทักแชท Messenger เพื่อรับส่วนลด 10%</a>
+  </div>
+
+  <p class="note">ตัวเลขนี้เป็นประมาณการเบื้องต้นเพื่อวางแผนเท่านั้น ราคาจริงขึ้นกับหน้างาน แบบก่อสร้าง วัสดุ และพื้นที่ของคุณ ยังไม่รวมค่าขออนุญาตต่อเติม ภาษี ค่าควบคุมงาน และเฟอร์นิเจอร์หรือตู้ครัวบิลต์อิน ควรขอใบเสนอราคาอย่างน้อย 2-3 เจ้า โดยใช้แบบและรายการวัสดุชุดเดียวกัน</p>
+
+  <div class="tips">
+    <h3>ก่อนขอใบเสนอราคา เตรียมให้ครบ</h3>
+    <ul>
+      <li>แบบที่มีขนาดและรายละเอียดวัสดุ ไม่ใช่แค่ภาพสเก็ช</li>
+      <li>ใบถอดปริมาณและราคา (BOQ) ชุดเดียวกัน ส่งให้ช่างทุกเจ้า</li>
+      <li>ระบุว่าราคารวมค่าแรงและค่าวัสดุหรือไม่ และรวมภาษีหรือไม่</li>
+      <li>ทำสัญญาโดยแนบแบบและ BOQ ทุกครั้ง</li>
+    </ul>
+  </div>
+
+  <div class="actions-grid">
+    <button id="share" type="button" class="btn-sec">แชร์ผลประเมิน</button>
+    <button id="copy" type="button">คัดลอกสรุปข้อความ</button>
+    <button id="print" type="button" class="btn-outline">พิมพ์ / บันทึก PDF</button>
+  </div>
+
+  <p class="foot">เติมเต็มบ้าน | ของดีราคาคุ้มค่ามีอยู่จริง<br>ทักข้อความเพื่อรับ Checklist 9 ข้อก่อนขอใบเสนอราคา<br>
+    <a href="https://m.me/termtembaan.design" target="_blank" rel="noopener">แชทผ่าน Facebook Messenger: เติมเต็มบ้าน</a>
+  </p>
+</main>
+
+<div class="bar" id="bar">
+  <div><small>งบโดยประมาณ</small><b id="barv">-</b></div>
+  <a class="chat" href="https://m.me/termtembaan.design" target="_blank" rel="noopener">ทักแชท Messenger</a>
+</div>
+
+<script>
+// ==========================================
+// 1. ตารางราคาและข้อมูลอ้างอิง (ปรับแก้ไขราคาที่นี่)
+// ==========================================
+const TYPES = [
+  {
+    id: "roof", name: "หลังคาโรงจอดรถ", vt: "เลือกวัสดุหลังคา", def: "pu", pile: [2, 8],
+    ic: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M4 14l38-5 1 4-38 5z"/><path d="M9 18v23M39 14v27"/><path d="M4 41h40"/><path d="M13 36h22v-4a2 2 0 0 0-1-1.7l-3.5-2.3h-13l-3.5 2.3a2 2 0 0 0-1 1.7z"/><circle cx="18.5" cy="36" r="2.5"/><circle cx="29.5" cy="36" r="2.5"/></svg>',
+    vars: [
+      { id: "m", name: "เมทัลชีท", min: 1200, max: 2000, d: "แบบเปลือยหรือมีฉนวน PE" },
+      { id: "pu", name: "เมทัลชีทบุ PU", min: 1900, max: 2500, d: "ฉนวน PU Foam ลดความร้อน" },
+      { id: "vn", name: "ไวนิล UPVC", min: 2500, max: 3000, d: "ท้องเรียบ" }
+    ]
+  },
+  {
+    id: "kitchen", name: "ห้องครัว", vt: "เลือกแบบครัว", def: "full", pile: [4, 5],
+    ic: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M17 7h14v6l6 8H11l6-8z"/><path d="M21 25c0-2 2-2 2-4M27 25c0-2 2-2 2-4"/><path d="M14 29h14c0 2-1.5 3-3 3h-8c-1.5 0-3-1-3-3z"/><path d="M28 29.5l7-2.5"/><path d="M7 32h34v9H7z"/><path d="M24 32v9"/><path d="M4 41h40"/></svg>',
+    vars: [
+      { id: "light", name: "ครัวเบา", min: 8000, max: 13000, d: "โครงสร้างเบา กึ่งเปิดโล่ง" },
+      { id: "full", name: "ครัวใช้งานจริง", min: 15000, max: 25000, d: "ก่อผนังทึบ ระบบน้ำ ไฟ ดูดควันครบ", mep: true, w: "ราคานี้รวมระบบน้ำ ไฟ และดูดควันแล้ว ส่วนท็อปเคาน์เตอร์และตู้ครัวควรสอบถามแยก" }
+    ]
+  },
+  {
+    id: "room", name: "ต่อเติมห้องข้างบ้าน", vt: "เลือกระดับงาน", def: "std", pile: [4, 5],
+    ic: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M4 41h40"/><path d="M5 21L18 10l13 11"/><path d="M8 20v21"/><path d="M28 20v21"/><path d="M14 30h8v11h-8z"/><path d="M28 22h14v19"/><rect x="31" y="27" width="8" height="7" rx="1"/></svg>',
+    vars: [
+      { id: "eco", name: "ประหยัด", min: 6000, max: 8000, d: "ใช้ระบบผนังเบา" },
+      { id: "std", name: "มาตรฐาน", min: 8000, max: 12000, d: "ก่ออิฐฉาบปูน มีฉนวน" },
+      { id: "pre", name: "พรีเมียม", min: 15000, max: 32000, d: "มีห้องน้ำในตัว งานตกแต่งบิลต์อิน", w: "ช่วงราคากว้างเพราะขึ้นกับจำนวนห้องน้ำและงานบิลต์อิน ควรให้ช่างถอด BOQ เพื่อดูตัวเลขจริง" }
+    ]
+  }
+];
+
+const PILE = [8000, 11000]; // เสาเข็มไมโครไพล์ตัวไอ I22 บาท/ต้น
+const ADDS = [
+  { id: "pile", name: "เสาเข็มเพิ่ม" },
+  { id: "mep", name: "งานไฟฟ้าและประปาเพิ่ม", d: "ย้ายจุดหรือเดินท่อใหม่", min: 15000, max: 40000 },
+  { id: "demo", name: "รื้อถอนของเดิม", d: "เช่น ผนัง พื้น หรือหลังคาเดิม", min: 5000, max: 25000 },
+  { id: "seal", name: "กันซึมและเก็บรอยต่อกับอาคารเดิม", d: "จุดที่มักรั่วถ้าทำไม่ดี", min: 8000, max: 25000 }
+];
+const DESIGN = [
+  { id: "none", name: "ไม่รวมค่าออกแบบ", d: "เหมาะถ้ามีแบบอยู่แล้ว" },
+  { id: "full", name: "แบบก่อสร้างครบ + ถอด BOQ", d: "ปรับแก้แบบได้ 3 ครั้ง" }
+];
+const TIERS = [[10, 140], [20, 120], [30, 100], [50, 90], [80, 70]];
+const D_BASE = 2000;
+const D_CAP = 15000;
+const D_OVER = 60;
+const RESERVE = 0.10; // เผื่อเหลือเผื่อขาด 10%
+
+// ==========================================
+// 2. State & Utilities
+// ==========================================
+const $ = (id) => document.getElementById(id);
+const th = (x) => x.toLocaleString("th-TH");
+const r1k = (x) => Math.round(x / 1000) * 1000;
+
+const state = {
+  type: "kitchen",
+  v: "full",
+  design: "full",
+  adds: {},
+  disc: false
+};
+
+let lastText = "";
+const curT = () => TYPES.find((x) => x.id === state.type);
+const curV = () => curT().vars.find((x) => x.id === state.v);
+
+function chipHTML(name, o, sel, inner) {
+  return '<label><input type="radio" name="' + name + '" value="' + o.id + '"' + (sel ? ' checked' : '') + '><span>' + inner + '</span></label>';
+}
+
+function renderTypes() {
+  $("types").innerHTML = TYPES.map((o) => chipHTML("type", o, state.type === o.id, o.ic + o.name)).join("");
+}
+
+function renderVars() {
+  const t = curT();
+  $("vtitle").textContent = t.vt;
+  $("vars").className = "chips";
+  $("vars").innerHTML = t.vars.map((o) => {
+    return chipHTML("v", o, state.v === o.id, '<b>' + o.name + '</b><em>' + th(o.min) + ' - ' + th(o.max) + ' บาท/ตร.ม.</em><small>' + o.d + '</small>');
+  }).join("");
+  const w = curV().w;
+  $("vnote").hidden = !w;
+  $("vnote").textContent = w || "";
+}
+
+function renderDesign() {
+  $("design").innerHTML = DESIGN.map((o) => chipHTML("design", o, state.design === o.id, '<b>' + o.name + '</b><small>' + o.d + '</small>')).join("");
+}
+
+function renderAdds() {
+  const v = curV();
+  $("adds").className = "opts-grid";
+  $("adds").innerHTML = ADDS.map((a) => {
+    const off = (a.id === "mep" && v.mep);
+    const isChecked = !off && !!state.adds[a.id];
+    return '<label class="opt-card' + (off ? ' off' : (isChecked ? ' checked' : '')) + '">' +
+      '<input type="checkbox" value="' + a.id + '"' + (off ? ' disabled' : (isChecked ? ' checked' : '')) + '>' +
+      '<span><b>' + a.name + '</b><small id="d_' + a.id + '">' + (off ? 'รวมอยู่ในราคาแล้ว' : (a.d || '')) + '</small></span></label>';
+  }).join("");
+}
+
+function getArea() {
+  const v = parseFloat($("area").value);
+  return isFinite(v) && v >= 1 ? Math.min(v, 500) : 0;
+}
+
+function designFee(a) {
+  let fee = D_BASE;
+  let prev = 0;
+  TIERS.forEach((t) => {
+    if (a > prev) {
+      fee += (Math.min(a, t[0]) - prev) * t[1];
+    }
+    prev = t[0];
+  });
+  if (a > 80) fee += (a - 80) * D_OVER;
+  return Math.min(Math.round(fee), D_CAP);
+}
+
+function setArea(v) {
+  $("area").value = v;
+  $("rng").value = Math.min(Math.max(v, 1), 80);
+  calc();
+}
+
+// ==========================================
+// 3. Calculation Logic
+// ==========================================
+function calc() {
+  const area = getArea();
+  const t = curT();
+  const v = curV();
+  const rows = [];
+  let lo = 0;
+  let hi = 0;
+  const df = state.design === "full";
+
+  $("dnote").textContent = df ? "พื้นที่ยิ่งมาก ยิ่งคุ้ม: เริ่มต้น 2,000 บาท แล้วราคาต่อ ตร.ม. ลดลงเป็นขั้นๆ" : "";
+  $("discw").hidden = !df;
+
+  if (!area) {
+    $("range").textContent = "กรอกพื้นที่ก่อน";
+    $("avg").textContent = "";
+    $("lo").textContent = $("mid").textContent = $("hi").textContent = "";
+    $("bd").innerHTML = "";
+    $("dtot").textContent = "";
+    $("barv").textContent = "-";
+    $("copy").disabled = true;
+    $("share").disabled = true;
+    $("s_job").textContent = "-";
+    $("s_area").textContent = "-";
+    $("s_val").textContent = "-";
+    lastText = "";
+    return;
+  }
+
+  $("copy").disabled = false;
+  $("share").disabled = false;
+
+  const al = r1k(area * v.min);
+  const ah = r1k(area * v.max);
+  rows.push([t.name + " (" + v.name + ") " + area + " ตร.ม.", al, ah]);
+  lo += al;
+  hi += ah;
+
+  ADDS.forEach((a) => {
+    if (!state.adds[a.id]) return;
+    if (a.id === "pile") {
+      const n = Math.max(t.pile[0], Math.ceil(area / t.pile[1]));
+      rows.push(["เสาเข็มเพิ่ม ประมาณ " + n + " ต้น", n * PILE[0], n * PILE[1]]);
+      lo += n * PILE[0];
+      hi += n * PILE[1];
+    } else if (!(a.id === "mep" && v.mep)) {
+      rows.push([a.name, a.min, a.max]);
+      lo += a.min;
+      hi += a.max;
+    }
+  });
+
+  const np = Math.max(t.pile[0], Math.ceil(area / t.pile[1]));
+  const pileDesc = $("d_pile");
+  if (pileDesc) {
+    pileDesc.textContent = "ประมาณ " + np + " ต้น (ไมโครไพล์ I22 ต้นละ " + th(PILE[0]) + " - " + th(PILE[1]) + " บาท) ต้องให้วิศวกรหรือช่างประเมินจริง";
+  }
+
+  const rl = r1k(lo * RESERVE);
+  const rh = r1k(hi * RESERVE);
+  rows.push(["เผื่อค่าก่อสร้างไม่คาดคิด 10%", rl, rh]);
+  lo += rl;
+  hi += rh;
+
+  if (df) {
+    const dfee = designFee(area);
+    rows.push(["ค่าออกแบบ + ถอด BOQ (เติมเต็มบ้าน)", dfee, dfee, "x"]);
+    lo += dfee;
+    hi += dfee;
+    $("dtot").textContent = "ค่าออกแบบ " + th(dfee) + " บาท";
+    if (state.disc) {
+      const ds = Math.round(dfee * 0.1);
+      rows.push(["ส่วนลดค่าออกแบบ 10%", -ds, -ds, "x", "neg"]);
+      lo -= ds;
+      hi -= ds;
+    }
+  } else {
+    $("dtot").textContent = "";
+  }
+
+  const rng = th(lo) + " - " + th(hi) + " บาท";
+  $("range").textContent = rng;
+  $("barv").textContent = rng;
+  $("avg").textContent = "เฉลี่ยประมาณ " + th(Math.round(lo / area / 100) * 100) + " - " + th(Math.round(hi / area / 100) * 100) + " บาท/ตร.ม. รวมทุกรายการ";
+  $("lo").textContent = th(lo);
+  $("mid").textContent = "ค่ากลาง " + th(Math.round((lo + hi) / 2));
+  $("hi").textContent = th(hi);
+
+  // Update Compact Screenshot Box
+  $("s_job").textContent = t.name + " (" + v.name + ")";
+  $("s_area").textContent = area + " ตร.ม.";
+  $("s_val").textContent = rng;
+
+  const cell = (r) => r[3] ? th(r[1]) : th(r[1]) + " - " + th(r[2]);
+  $("bd").innerHTML = rows.map((r) => '<tr' + (r[4] ? ' class="neg"' : '') + '><td>' + r[0] + '</td><td>' + cell(r) + '</td></tr>').join("") +
+    '<tr class="tot"><td>รวมโดยประมาณ</td><td>' + th(lo) + " - " + th(hi) + '</td></tr>';
+
+  lastText = "ประเมินงบต่อเติมเบื้องต้น (เติมเต็มบ้าน)\n" +
+    rows.map((r) => "- " + r[0] + ": " + cell(r) + " บาท").join("\n") +
+    "\nรวมโดยประมาณ: " + rng +
+    "\n(ประมาณการเบื้องต้น ควรขอใบเสนอราคาโดยใช้แบบและ BOQ ชุดเดียวกัน)";
+}
+
+// ==========================================
+// 4. Event Listeners & Initialize
+// ==========================================
+renderTypes();
+renderVars();
+renderDesign();
+renderAdds();
+
+$("presets").innerHTML = [6, 12, 20, 30, 50].map((n) => '<button type="button" data-a="' + n + '">' + n + ' ตร.ม.</button>').join("");
+
+$("presets").addEventListener("click", (e) => {
+  const a = e.target.getAttribute("data-a");
+  if (a) setArea(+a);
+});
+
+// Thumb Stepper Listeners
+$("sub_area").addEventListener("click", () => {
+  const v = Math.max(getArea() - 1, 1);
+  setArea(v);
+});
+$("add_area").addEventListener("click", () => {
+  const v = Math.min(getArea() + 1, 500);
+  setArea(v);
+});
+
+$("types").addEventListener("change", (e) => {
+  state.type = e.target.value;
+  state.v = curT().def;
+  renderVars();
+  renderAdds();
+  calc();
+});
+
+$("vars").addEventListener("change", (e) => {
+  state.v = e.target.value;
+  const w = curV().w;
+  $("vnote").hidden = !w;
+  $("vnote").textContent = w || "";
+  renderAdds();
+  calc();
+});
+
+$("design").addEventListener("change", (e) => {
+  state.design = e.target.value;
+  calc();
+});
+
+$("adds").addEventListener("change", (e) => {
+  state.adds[e.target.value] = e.target.checked;
+  const card = e.target.closest(".opt-card");
+  if (card) card.classList.toggle("checked", e.target.checked);
+  calc();
+});
+
+$("disc").addEventListener("change", function() {
+  state.disc = this.checked;
+  calc();
+});
+
+$("rng").addEventListener("input", function() {
+  $("area").value = this.value;
+  calc();
+});
+
+$("area").addEventListener("input", function() {
+  let v = parseFloat(this.value);
+  if (v > 500) {
+    this.value = 500;
+    v = 500;
+  }
+  if (v >= 1) $("rng").value = Math.min(Math.max(v, 1), 80);
+  calc();
+});
+
+$("area").addEventListener("change", function() {
+  const v = parseFloat(this.value);
+  if (this.value !== "" && !(v >= 1)) {
+    this.value = 1;
+    $("rng").value = 1;
+    calc();
+  }
+});
+
+// ซ่อนแถบ Sticky Bar ขณะเปิดแป้นพิมพ์ เพื่อไม่ให้บดบังการพิมพ์บนมือถือ
+$("area").addEventListener("focus", () => {
+  $("bar").style.transform = "translateY(150%)";
+});
+$("area").addEventListener("blur", () => {
+  $("bar").style.transform = "";
+});
+
+// คัดลอกข้อความสรุป
+$("copy").addEventListener("click", function() {
+  const b = this;
+  const txt = lastText;
+  const done = (m) => {
+    b.textContent = m;
+    setTimeout(() => { b.textContent = "คัดลอกสรุปข้อความ"; }, 2200);
+  };
+  const fallback = () => {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = txt;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      done(ok ? "คัดลอกแล้ว" : "คัดลอกไม่ได้ ลองแคปหน้าจอแทน");
+    } catch (e) {
+      done("คัดลอกไม่ได้ ลองแคปหน้าจอแทน");
+    }
+  };
+  try {
+    navigator.clipboard.writeText(txt).then(() => { done("คัดลอกแล้ว"); }, fallback);
+  } catch (e) {
+    fallback();
+  }
+});
+
+// แชร์สรุปผลประเมิน (Web Share API)
+$("share").addEventListener("click", async function() {
+  const b = this;
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: "ประเมินงบต่อเติมบ้านเบื้องต้น (เติมเต็มบ้าน)",
+        text: lastText
+      });
+    } catch (e) {
+      // User cancelled
+    }
+  } else {
+    // ถ้าเบราว์เซอร์ไม่รองรับ ให้กดคัดลอกแทนอัตโนมัติ
+    $("copy").click();
+    b.textContent = "คัดลอกแทนแล้ว (ส่งต่อได้เลย)";
+    setTimeout(() => { b.textContent = "แชร์ผลประเมิน"; }, 2200);
+  }
+});
+
+// พิมพ์ / บันทึก PDF
+$("print").addEventListener("click", () => {
+  window.print();
+});
+
+// Sticky Bottom Bar
+try {
+  const bar = $("bar");
+  new IntersectionObserver((entries) => {
+    bar.classList.toggle("on", !entries[0].isIntersecting);
+  }, { threshold: 0.15 }).observe($("res"));
+} catch (e) {}
+
+calc();
+</script>
+</body>
+</html>
