@@ -147,6 +147,10 @@ a.chat:active{transform:scale(0.98)}
 .bar b{font-size:18px;font-variant-numeric:tabular-nums}
 @media (prefers-reduced-motion:reduce){.bar{transition:none}}
 
+/* Visitor Counter */
+.foot-visit{color:var(--muted);font-size:13px;display:inline-block;margin-top:8px}
+.foot-visit strong{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+
 /* สำหรับการสั่งพิมพ์ หรือบันทึกเป็น PDF */
 @media print{
   body{background:#fff!important;color:#000!important;font-size:14px}
@@ -242,8 +246,9 @@ a.chat:active{transform:scale(0.98)}
     <button id="print" type="button" class="btn-outline">พิมพ์ / บันทึก PDF</button>
   </div>
 
-  <p class="foot">เติมเต็มบ้าน | ของดีราคาคุ้มค่ามีอยู่จริง<br>ทักข้อความเพื่อรับ Checklist 9 ข้อก่อนขอใบเสนอราคา<br>
-    <a href="https://www.facebook.com/termtembaan.design" target="_blank" rel="noopener">Facebook: เติมเต็มบ้าน</a>
+  <p class="foot">เติมเต็มบ้าน | เติมเต็มความสุขทุกพื้นที่ของบ้าน<br>
+    <a href="https://www.facebook.com/termtembaan.design" target="_blank" rel="noopener">Facebook: เติมเต็มบ้าน</a><br>
+    <small class="foot-visit">ผู้เข้าใช้งานแล้ว <strong id="visitor_count_foot">-</strong> ครั้ง</small>
   </p>
 </main>
 
@@ -650,6 +655,43 @@ try {
     bar.classList.toggle("on", !entries[0].isIntersecting);
   }, { threshold: 0.15 }).observe($("res"));
 } catch (e) {}
+
+// ==========================================
+// 5. Visitor Counter (ยอดเข้าใช้งานสด - แสดงด้านล่างสุด)
+// ==========================================
+(function initVisitorCounter() {
+  const countFootEl = $("visitor_count_foot");
+  if (!countFootEl) return;
+
+  // คีย์นับยอดเฉพาะของ เติมเต็มบ้าน
+  const counterKey = "termtembaan_design_visits";
+
+  // ป้องกันการนับเบิ้ลเมื่อกด Refresh ซ้ำในแท็บเดิม (sessionStorage)
+  const isCounted = sessionStorage.getItem("ttb_counted");
+  const action = isCounted ? "get" : "hit";
+  const apiUrl = "https://countapi.mileshilliard.com/api/v1/" + action + "/" + counterKey;
+
+  fetch(apiUrl)
+    .then((res) => {
+      if (!res.ok) throw new Error("API error");
+      return res.json();
+    })
+    .then((data) => {
+      const val = data.value || data.count;
+      if (typeof val === "number") {
+        sessionStorage.setItem("ttb_counted", "1");
+        countFootEl.textContent = th(val);
+      } else {
+        countFootEl.textContent = "-";
+      }
+    })
+    .catch(() => {
+      // กรณีออฟไลน์หรือบล็อก network ให้ซ่อนแถวนี้
+      if (countFootEl.parentElement) {
+        countFootEl.parentElement.style.display = "none";
+      }
+    });
+})();
 
 calc();
 </script>
